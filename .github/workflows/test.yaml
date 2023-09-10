@@ -1,0 +1,46 @@
+name: Rover Plan Terraform
+
+on:
+  workflow_dispatch:
+  push:
+
+permissions:
+  id-token: write
+  contents: write
+  pull-requests: write
+
+env:
+  AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Azure login
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_MANAGEMENT_SUBSCRIPTION_ID }}        
+        allow-no-subscriptions: true
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 1.0.0
+
+    - name: Terraform Init
+      run: terraform init ./terraform
+
+    - name: Terraform Plan
+      run: terraform plan -out=tfplan ./terraform 2>&1 | tee "$RUNNER_TEMP/${{ github.run_id }}_terraform_output_file.txt"
+
+    - name: Test and Confirm GitHub Action
+      uses: ./ # Or use the repository URL if testing from another repository
+      with:
+        output_file: "$RUNNER_TEMP/${{ github.run_id }}_terraform_output_file.txt"

@@ -24,18 +24,12 @@ fi
 
 # Capture the Terraform plan output into a variable
 plan_output=$(cat "$output_file")
+essential_output=$(extract_essential_output "$output_file")
 
-if ${{ steps.evaluate-plan-exit-code.outputs.no_changes != 'true' }}; then
-  # Extract the essential part of the output
-  essential_output=$(extract_essential_output "$output_file")
-
-  # Comment on PR
-  if [[ -z $essential_output ]]; then
-    comment_on_pr "Not able to extract Terraform essential output. Please check the plan output file."
-  else
-    comment_body=$(printf "## Terraform Plan Essential Output\n\`\`\`\n%s\n\`\`\`\n" "$essential_output")
-    comment_on_pr "$comment_body"
-  fi
+# Comment on PR
+if [[ -z $essential_output ]]; then
+  comment_on_pr "Terraform essential output is empty. Please check the plan output."
 else
-  comment_on_pr "No Rover Plan changes detected. Pull Request safe to merge."
+  comment_body=$(printf "## Terraform Plan Essential Output\n\`\`\`\n%s\n\`\`\`\n" "$essential_output")
+  comment_on_pr "$comment_body"
 fi
