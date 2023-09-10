@@ -1,0 +1,39 @@
+name: Release New Version
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: false
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install semantic-release
+      run: npm install semantic-release@latest
+
+    - name: Configure Git
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "github-actions@example.com"
+
+    - name: Create Release and Tag
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: npx semantic-release
+
+    - name: Publish to GitHub Marketplace
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Your logic to publish the action to the GitHub Marketplace
