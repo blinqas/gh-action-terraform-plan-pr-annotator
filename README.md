@@ -1,42 +1,45 @@
 # tf-plan-pr-comment
 
 ## Overview
-tf-plan-pr-comment is a GitHub Action that automatically extracts and annotates essential Terraform plan output within GitHub Pull Requests. This action aims to enhance code reviews by providing a concise summary of the Terraform plan, making it easier for reviewers to understand the impact of the changes. It also aids in compliance by ensuring that only reviewed and approved Terraform changes are applied.
-
-## Example Output
-
+`tf-plan-pr-comment` is a GitHub Action designed to simplify code reviews and enhance compliance. It automatically extracts, annotates, and comments essential Terraform plan output within GitHub Pull Requests.
 
 ## Features
-Extracts essential parts of the Terraform plan output.
-Annotates the extracted output for better readability.
-Comments the annotated output directly on the GitHub Pull Request.
-Supports conditional comments based on the Terraform plan's exit code.
+- **Automated Extraction**: Isolates crucial parts of the Terraform plan output.
+- **Annotation**: Enhances readability by annotating the extracted output.
+- **Pull Request Comments**: Posts the annotated output directly on the GitHub Pull Request.
+- **Conditional Comments**: Supports comments based on the Terraform plan's exit code.
 
 ## Prerequisites
-GitHub Actions must be enabled on your GitHub repository.
-A Terraform project that you want to run this action on.
-A GitHub Pull Request in the repository where you want to use this action.
+- GitHub Actions enabled on your repository.
+- A Terraform project to run this action on.
+- An open GitHub Pull Request in the target repository.
 
 ## Inputs
-Name	Description	Default	Required
-output_file	The path to the file containing the Terraform plan output.	None	Yes
+
+| Name          | Description                                         | Default | Required |
+|---------------|-----------------------------------------------------|---------|----------|
+| `output_file` | Path to the file with the Terraform plan output.    | None    | Yes      |
 
 ## Usage
-Add the following step to your GitHub Actions workflow YAML file:
 
-yaml
-```
+
+```yaml
 - name: Comment Terraform Plan on PR
-  uses: [Your_GitHub_Org]/tf-plan-pr-comment@v1
+  uses: blinqas/tf-plan-pr-comment@v1
   with:
     output_file: 'path/to/your/output/file'
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## Example Workflow
-Here's an example workflow that demonstrates how to use tf-plan-pr-comment:
+### Key Points:
+- Use `-no-color` with terraform plan for parseable output.
+- Utilize `2>&1` to redirect both `stdout` and `stderr` to the same file.
+- Use `tee` to write the output to a file for the action.
+- Assumes terraform plan runs from the repo root.
 
-yaml
-```
+```yaml
 name: Terraform CI
 
 on:
@@ -56,15 +59,17 @@ jobs:
       run: terraform plan -no-color 2>&1 | tee ${{ github.workspace }}/plan_output.txt
 
     - name: Comment Terraform Plan on PR
-      uses: [Your_GitHub_Org]/tf-plan-pr-comment@v1
+      uses: blinqas/tf-plan-pr-comment@v1
       with:
         output_file: ${{ github.workspace }}/plan_output.txt
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+## Example Comment on the Pull Request
+![Example Comment in Pull Request](./images/example-output.png)
 
 ## Contributing
-Please read CONTRIBUTING.md for details on our code of conduct, and the process for submitting pull requests.
+See CONTRIBUTING.md for contribution guidelines.
 
 ## License
-This project is licensed under the MIT License - see the LICENSE.md file for details.
-
-Feel free to modify this template to better suit your project's specific needs. This should give your users a good starting point for understanding how to use your GitHub Action effectively.
+Licensed under MIT. See LICENSE.md for details.
