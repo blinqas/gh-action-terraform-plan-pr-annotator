@@ -35,10 +35,10 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         allow-no-subscriptions: true
 
-    - name: Install Latest Terraform
+    - name: Install Latest Stable Terraform
       run: |
-        curl -sL https://releases.hashicorp.com/terraform/index.json | jq -r '.versions[].builds[].url' | grep 'linux.*amd64' | sort -V | tail -n1 | wget -i -
-        unzip terraform_*_linux_amd64.zip
+        curl -sL https://releases.hashicorp.com/terraform/index.json | jq -r '.versions[].builds[].url' | grep 'linux.*amd64' | grep -v 'beta' | sort -V | tail -n1 | wget -i -
+        unzip -o terraform_*_linux_amd64.zip
         sudo mv terraform /usr/local/bin/
         terraform -version
 
