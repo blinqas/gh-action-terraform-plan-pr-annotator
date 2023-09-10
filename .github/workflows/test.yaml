@@ -1,4 +1,4 @@
-name: Rover Plan Terraform
+name: Test and Confirm GitHub Action
 
 on:
   workflow_dispatch:
