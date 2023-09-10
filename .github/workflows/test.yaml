@@ -56,4 +56,4 @@ jobs:
     - name: Test and Confirm GitHub Action
       uses: ./ # Or use the repository URL if testing from another repository
       with:
-        output_file: "$RUNNER_TEMP/${{ github.run_id }}_terraform_output_file.txt"
+        output_file: "${{ runner.temp }}/${{ github.run_id }}_terraform_output_file.txt"
