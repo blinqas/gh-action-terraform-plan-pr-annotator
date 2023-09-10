@@ -121,3 +121,5 @@ jobs:
       uses: ./ # Or use the repository URL if testing from another repository
       with:
         output_file: "${{ steps.terraform-plan.outputs.output_file }}"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
