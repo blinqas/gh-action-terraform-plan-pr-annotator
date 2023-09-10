@@ -37,7 +37,7 @@ jobs:
 
     - name: Install Latest Stable Terraform
       run: |
-        curl -sL https://releases.hashicorp.com/terraform/index.json | jq -r '.versions[].builds[].url' | grep 'linux.*amd64' | grep -v 'beta' | sort -V | tail -n1 | wget -i -
+        curl -sL https://releases.hashicorp.com/terraform/index.json | jq -r '.versions[].builds[].url' | grep 'linux.*amd64' | grep -v 'beta' | grep -v 'alpha' | sort -V | tail -n1 | wget -i -
         rm -rf terraform_binary && mkdir terraform_binary
         unzip -o terraform_*_linux_amd64.zip -d ./terraform_binary
         sudo mv ./terraform_binary/terraform /usr/local/bin/
@@ -49,9 +49,13 @@ jobs:
         terraform init
 
     - name: Terraform Plan
+      id: terraform-plan
       run: |
+        output_file="$RUNNER_TEMP/${{ github.run_id }}_terraform_output_file.txt"
+        echo "output_file=$output_file" >> $GITHUB_ENV
+        echo "output_file=$output_file" >> $GITHUB_OUTPUT
         cd "${{ github.workspace }}/terraform"
-        terraform plan -out=tfplan -detailed-exitcode 2>&1 | tee "$RUNNER_TEMP/${{ github.run_id }}_terraform_output_file.txt"
+        terraform plan -out=tfplan -detailed-exitcode 2>&1 | tee "$output_file"
         plan_exit_code=${PIPESTATUS[0]}
         echo "PLAN_EXIT_CODE=$plan_exit_code" >> $GITHUB_ENV
 
@@ -116,4 +120,4 @@ jobs:
     - name: Test and Confirm GitHub Action
       uses: ./ # Or use the repository URL if testing from another repository
       with:
-        output_file: "${{ runner.temp }}/${{ github.run_id }}_terraform_output_file.txt"
+        output_file: "${{ steps.terraform-plan.outputs.output_file }}"
