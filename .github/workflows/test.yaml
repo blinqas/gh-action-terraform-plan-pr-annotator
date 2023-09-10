@@ -38,8 +38,9 @@ jobs:
     - name: Install Latest Stable Terraform
       run: |
         curl -sL https://releases.hashicorp.com/terraform/index.json | jq -r '.versions[].builds[].url' | grep 'linux.*amd64' | grep -v 'beta' | sort -V | tail -n1 | wget -i -
-        unzip -o terraform_*_linux_amd64.zip
-        sudo mv terraform /usr/local/bin/
+        rm -rf terraform_binary && mkdir terraform_binary
+        unzip -o terraform_*_linux_amd64.zip -d ./terraform_binary
+        sudo mv ./terraform_binary/terraform /usr/local/bin/
         terraform -version
 
     - name: Terraform Init
