@@ -39,5 +39,12 @@ if [[ -z $clean_essential_output ]]; then
   comment_on_pr "Terraform essential output is empty. Please check the plan output."
 else
   comment_body=$(printf "## Terraform Plan Essential Output\n\`\`\`\n%s\n\`\`\`\n" "$clean_essential_output")
-  comment_on_pr "$comment_body"
+  if [[ $comment_on_pull_request == "true" ]]; then
+    # Comment on the PR
+    comment_on_pr "$comment_body"
+  fi
+  if [[ $essential_output_file != "" ]]; then
+    # Save the essential output to a file
+    echo "$comment_body" > "$essential_output_file"
+  fi  
 fi

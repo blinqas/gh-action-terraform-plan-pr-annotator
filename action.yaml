@@ -4,10 +4,19 @@ inputs:
   output_file:
     description: 'Path to the Terraform plan output file'
     required: true
+  comment_on_pull_request:
+    description: 'Whether to comment on the Pull Request or not'
+    required: false
+    default: "true"
+  essential_output_file:
+    description: 'Name to the essential Terraform plan output file'
+    required: false
+outputs:
+  essential-plan-output: 
 runs:
   using: 'composite'
   steps:
-    - run: chmod +x ${{ github.action_path }}/src/main.sh
-      shell: bash
-    - run: ${{ github.action_path }}/src/main.sh "${{ inputs.output_file }}"
+    - name: Run
+      id: run
+      run: ${{ github.action_path }}/src/main.sh "${{ inputs.output_file }}"
       shell: bash
